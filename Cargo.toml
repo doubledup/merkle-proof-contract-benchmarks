@@ -1,0 +1,10 @@
+[package]
+name = "optimisation-beefy-merkle-proofs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+beefy-merkle-tree = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30" }
+hex = "0.4.3"
