@@ -1,1 +1,2 @@
 openzeppelin/=lib/openzeppelin-contracts/contracts/
+solidity-merkle-trees/=lib/solidity-merkle-trees/lib/

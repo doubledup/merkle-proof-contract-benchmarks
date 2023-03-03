@@ -23,7 +23,7 @@ fn main() -> std::io::Result<()> {
 }
 
 fn single_proofs_sorted_hashes(leaf_indices: Vec<usize>) -> String {
-    let leaves = build_leaves_str(leaf_indices.clone());
+    let leaves = build_leaves_str_single_proof(leaf_indices.clone());
 
     let root = format!("bytes32 root = 0x{};", hex::encode(merkle_root::<beefy_merkle_tree::Keccak256, _>(data::LEAVES)));
 
@@ -81,70 +81,7 @@ contract SingleProofsTest is Test {{
     )
 }
 
-#[derive(Clone)]
-struct Keccak256;
-
-impl Hasher for Keccak256 {
-    type Hash = [u8; 32];
-
-    fn hash(data: &[u8]) -> [u8; 32] {
-        keccak256(data)
-    }
-}
-
-fn multi_proofs_test_contract(leaf_indices: Vec<usize>) -> String {
-    let leaves = build_leaves_str(leaf_indices.clone());
-
-    let tree = MerkleTree::<Keccak256>::from_leaves(&data::LEAVES.map(|leaf| keccak256(leaf.as_slice())));
-    let root = format!("bytes32 root = 0x{};", tree.root_hex().unwrap());
-
-    let proofs = tree.proof_2d(&leaf_indices);
-
-    let proof_arrays = proofs.clone().into_iter()
-        .enumerate()
-        .map(|(i, layer)| format!("    bytes32[] proof{} = [ {} ];",
-            i,
-            layer.into_iter()
-                .map(|(j, hash)| format!("({}, bytes32(0x{}))", j, hex::encode(hash)))
-                .collect::<Vec<String>>()
-                .join(", ")
-        ))
-        .collect::<Vec<String>>()
-        .join("\n");
-
-    let all_proofs = format!("bytes32[][] proofs = [ {} ];\n", (0..proofs.len())
-        .map(|i| {
-            format!("proof{}", i)
-        })
-        .collect::<Vec<String>>()
-        .join(", "));
-
-    format!("// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
-
-import \"forge-std/Test.sol\";
-import \"forge-std/console.sol\";
-
-contract MultiProofsTest is Test {{
-    {}
-    {}
-{}
-    {}
-    function testMultiProofs() public view {{
-        for (uint i = 0; i < leaves.length; ++i) {{
-            assert(MerkleProof.verify(proofs[i], root, keccak256(abi.encode(leaves[i]))));
-        }}
-    }}
-}}
-",
-        leaves,
-        root,
-        proof_arrays,
-        all_proofs,
-    )
-}
-
-fn build_leaves_str(leaf_indices: Vec<usize>) -> String {
+fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
     let leaves_hex = data::LEAVES.into_iter()
         .enumerate()
         .filter_map(|(i, leaf)| {
@@ -161,4 +98,92 @@ fn build_leaves_str(leaf_indices: Vec<usize>) -> String {
             .map(|leaf| format!("bytes32(0x{})", leaf))
             .collect::<Vec<_>>()
             .join(", "))
+}
+
+#[derive(Clone)]
+struct Keccak256;
+
+impl Hasher for Keccak256 {
+    type Hash = [u8; 32];
+
+    fn hash(data: &[u8]) -> [u8; 32] {
+        keccak256(data)
+    }
+}
+
+fn multi_proofs_test_contract(leaf_indices: Vec<usize>) -> String {
+    let leaves = build_leaves_str_multi_proof(leaf_indices.clone());
+
+    // let tree = MerkleTree::<Keccak256>::from_leaves(&data::LEAVES.map(|leaf| keccak256(leaf.as_slice())));
+    let tree = MerkleTree::<Keccak256>::from_leaves(&data::LEAVES.map(|leaf| keccak256(leaf.as_slice())));
+    let root = format!("bytes32 root = 0x{};", tree.root_hex().unwrap());
+
+    let proofs = tree.proof_2d(&leaf_indices);
+
+    let proof_declaration = format!("Node[][] memory proof = new Node[][]({});", proofs.len());
+
+    let proof_arrays = proofs.clone().into_iter()
+        .enumerate()
+        .map(|(i, layer)| {
+            let declaration = format!("        proof[{}] = new Node[]({});", i, proofs.get(i).map_or(0, |proof| proof.len()));
+            let nodes =
+                layer.into_iter()
+                    .enumerate()
+                    .map(|(j, (k, hash))| format!("        proof[{}][{}] = Node({{k_index: {}, node: bytes32(0x{})}});", i, j, k, hex::encode(hash)))
+                    .collect::<Vec<String>>()
+                    .join("\n");
+            if nodes.is_empty() {
+                declaration
+            } else {
+                format!("{}\n{}", declaration, nodes)
+            }
+        })
+        .collect::<Vec<String>>()
+        .join("\n");
+
+    format!("// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.17;
+
+import \"forge-std/Test.sol\";
+import \"solidity-merkle-trees/MerkleMultiProof.sol\";
+
+contract MultiProofsTest is Test {{
+    {}
+
+    function testMultiProofs() public view {{
+        {}
+
+        {}
+{}
+
+        assert(MerkleMultiProof.verifyProof(root, proof, leaves));
+    }}
+}}
+",
+        root,
+        leaves,
+        proof_declaration,
+        proof_arrays,
+    )
+}
+
+fn build_leaves_str_multi_proof(leaf_indices: Vec<usize>) -> String {
+    let leaves_hex = data::LEAVES.into_iter()
+        .enumerate()
+        .filter_map(|(i, leaf)| {
+            if leaf_indices.contains(&i) {
+                Some((i, hex::encode(&leaf)))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+
+    let declaration = format!("Node[] memory leaves = new Node[]({});", leaves_hex.len());
+    let leaves = leaves_hex.into_iter()
+        .enumerate()
+        .map(|(i, (j, leaf))| format!("        leaves[{}] = Node({{k_index: {}, node: keccak256(abi.encode(bytes32(0x{})))}});", i, j, leaf))
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!("{}\n{}", declaration, leaves)
 }
