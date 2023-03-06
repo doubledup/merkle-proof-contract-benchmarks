@@ -11,7 +11,7 @@ fn main() -> std::io::Result<()> {
 
     let single_proofs = single_proofs_sorted_hashes(leaf_indices.clone());
 
-    let mut single_proof_file = File::create("test/SingleProof.t.sol")?;
+    let mut single_proof_file = File::create("test/SingleProofs.t.sol")?;
     let single_proof_result = single_proof_file.write_all(single_proofs.as_bytes());
 
     let multi_proofs = multi_proofs_test_contract(leaf_indices);
