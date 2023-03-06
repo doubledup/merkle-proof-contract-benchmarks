@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "src/MultiProof.sol";
 
 contract MultiProofTest is Test {
-    bytes32 root = 0xe9d2e4ee51fdc67a8a715824c6e0e3dfa013f2fbc17b529ab9787d66b6b1df12;
+    bytes32 root = 0xe3bed918d1f4dd365a6750611fa0396df1313e58dc71c9294f5e6e2e61064479;
     MultiProof proofContract;
 
     function setUp() public {
@@ -36,17 +36,17 @@ contract MultiProofTest is Test {
         proof[2] = new Node[](0);
         proof[3] = new Node[](0);
         proof[4] = new Node[](1);
-        proof[4][0] = Node({k_index: 1, node: bytes32(0x587ff23491bd611850951f5687cf01abd2f3d1fb7831abae7ce9dfc29a6f840e)});
+        proof[4][0] = Node({k_index: 1, node: bytes32(0x4af8884809dc528c832c9fea1be84c0c5209277b91293d24f717b88801e9e181)});
         proof[5] = new Node[](1);
-        proof[5][0] = Node({k_index: 1, node: bytes32(0x59c94a159accf87d0ef183b868a6e63f29e3b8787aa0ca8bcbe0526461f30ede)});
+        proof[5][0] = Node({k_index: 1, node: bytes32(0x253f7b20fcd44e426a7c191e9cf89abcb514d0b480a987a052f8d9d1f3715d72)});
         proof[6] = new Node[](1);
-        proof[6][0] = Node({k_index: 1, node: bytes32(0xc66c1da05d80ec9e72cc3bed4e600da7d688c7a7bde6c029749ecd9abe0a0c44)});
+        proof[6][0] = Node({k_index: 1, node: bytes32(0x595d11848f09575dfbbf6bfe2b917956d15d3239addc3a651b90058762c348bb)});
         proof[7] = new Node[](1);
-        proof[7][0] = Node({k_index: 1, node: bytes32(0x208340fd1b6c076733be0c3cbfa64a05b3202c971e7e15811984f001a7271ad2)});
+        proof[7][0] = Node({k_index: 1, node: bytes32(0xbb0bc2cb5fbe4de1d0e58c37003a9e2967020d4456ec66de0115c7298d4b9ce6)});
         proof[8] = new Node[](1);
-        proof[8][0] = Node({k_index: 1, node: bytes32(0xf4a3e48c32347d37cb871aaf207fc6a7b5df27b335528b40c8475f859509e39c)});
+        proof[8][0] = Node({k_index: 1, node: bytes32(0x8376f950dd4eff30a311512e06d1b01e59bcc7098f15433752021f5cc1bbfa8f)});
         proof[9] = new Node[](1);
-        proof[9][0] = Node({k_index: 1, node: bytes32(0x1ebd16027005e3ce1351f6d7317c7de195fd135c66a76311c08f84d8205e792c)});
+        proof[9][0] = Node({k_index: 1, node: bytes32(0x1d375245de36bf8a22d4cc1fb487925dc486517474eea65cb0a82d265b33d0c2)});
         proof[10] = new Node[](0);
 
         assert(proofContract.verifyProof(root, proof, leaves));

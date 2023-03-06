@@ -8,5 +8,5 @@
 	branch = v4.8.1
 [submodule "lib/solidity-merkle-trees"]
 	path = lib/solidity-merkle-trees
-	url = https://github.com/doubledup/solidity-merkle-trees
-	branch = seun-multiproof-vs-single-proofs
+	url = https://github.com/polytope-labs/solidity-merkle-trees
+	branch = main

@@ -1557,7 +1557,7 @@ checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 [[package]]
 name = "rs_merkle"
 version = "1.2.0"
-source = "git+https://github.com/doubledup/rs-merkle?branch=master#a4334ac58b4431c4f334f9b69c6c5b8d7dced111"
+source = "git+https://github.com/polytope-labs/rs-merkle?branch=master#6a19fb11cb2144f00f00ce99da8b06e030e89131"
 dependencies = [
  "micromath",
  "sha2 0.10.6",
