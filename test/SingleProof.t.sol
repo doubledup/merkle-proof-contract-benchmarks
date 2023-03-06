@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "src/SingleProofs.sol";
 
 contract SingleProofsTest is Test {
-    bytes32[] leaves = [ bytes32(0xfa4859480aa6d899858de54334d2911e01c070df858de54334d2911e01c070df), bytes32(0x355069da35e598913d8736e5b8340527099960b83d8736e5b8340527099960b8), bytes32(0x7663893c3dc0850efc5391f5e5887ed723e51b83fc5391f5e5887ed723e51b83) ];
+    bytes32[] leaves = [ keccak256(abi.encode(bytes32(0xfa4859480aa6d899858de54334d2911e01c070df858de54334d2911e01c070df))), keccak256(abi.encode(bytes32(0x355069da35e598913d8736e5b8340527099960b83d8736e5b8340527099960b8))), keccak256(abi.encode(bytes32(0x7663893c3dc0850efc5391f5e5887ed723e51b83fc5391f5e5887ed723e51b83))) ];
     SingleProofs proofContract;
 
     function setUp() public {

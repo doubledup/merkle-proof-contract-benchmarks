@@ -99,7 +99,7 @@ fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
 
     format!("bytes32[] leaves = [ {} ];",
         leaves_hex.into_iter()
-            .map(|leaf| format!("bytes32(0x{})", leaf))
+            .map(|leaf| format!("keccak256(abi.encode(bytes32(0x{})))", leaf))
             .collect::<Vec<_>>()
             .join(", "))
 }

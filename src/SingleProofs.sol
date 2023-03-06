@@ -15,7 +15,7 @@ contract SingleProofs {
     {
         bool verified = true;
         for (uint i = 0; i < leaves.length; ++i) {
-            verified = verified && MerkleProof.verify(proofs[i], root, keccak256(abi.encode(leaves[i])));
+            verified = verified && MerkleProof.verify(proofs[i], root, leaves[i]);
         }
         return verified;
     }
