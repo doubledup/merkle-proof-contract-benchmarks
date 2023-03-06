@@ -34,22 +34,19 @@ fn single_proofs_sorted_hashes(leaf_indices: Vec<usize>) -> String {
         .clone()
         .enumerate()
         .map(|(i, proof)| {
-            format!("    bytes32[] proof{} = [ {} ];",
+            format!("        proofs[{}] = new bytes32[]({});\n{}",
                 i,
+                proof.proof.len(),
                 proof.proof.into_iter()
-                    .map(|hash| format!("bytes32(0x{})", hex::encode(hash)))
+                    .enumerate()
+                    .map(|(j, hash)| format!("        proofs[{}][{}] = bytes32(0x{});", i, j, hex::encode(hash)))
                     .collect::<Vec<String>>()
-                    .join(", "))
+                    .join("\n"))
         })
         .collect::<Vec<String>>()
-        .join("\n");
+        .join("\n\n");
 
-    let all_proofs = format!("bytes32[][] proofs = [ {} ];\n", (0..proofs_sorted_hashes.len())
-        .map(|i| {
-            format!("proof{}", i)
-        })
-        .collect::<Vec<String>>()
-        .join(", "));
+    let proofs_declaration = format!("bytes32[][] memory proofs = new bytes32[][]({});\n", proofs_sorted_hashes.len());
 
     proofs_sorted_hashes.into_iter().for_each(|proof|{
         let verified = verify_proof::<beefy_merkle_tree::Keccak256, _, _>(&proof.root, proof.proof, proof.number_of_leaves, proof.leaf_index, &proof.leaf);
@@ -70,18 +67,19 @@ contract SingleProofsTest is Test {{
         proofContract = new SingleProofs();
     }}
 
-    {}
-{}
-    {}
     function testSingleProofs() public view {{
+        {}
+        {}
+{}
+
         assert(proofContract.verifyProofs(root, proofs, leaves));
     }}
 }}
 ",
-        leaves,
         root,
+        leaves,
+        proofs_declaration,
         proof_arrays,
-        all_proofs,
     )
 }
 
@@ -97,11 +95,16 @@ fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
         })
         .collect::<Vec<_>>();
 
-    format!("bytes32[] leaves = [ {} ];",
+    format!("bytes32[] memory leaves = new bytes32[]({});
+
+{}
+",
+        leaves_hex.len(),
         leaves_hex.into_iter()
-            .map(|leaf| format!("keccak256(abi.encode(bytes32(0x{})))", leaf))
+            .enumerate()
+            .map(|(i, leaf)| format!("        leaves[{}] = keccak256(abi.encode(bytes32(0x{})));", i, leaf))
             .collect::<Vec<_>>()
-            .join(", "))
+            .join("\n"))
 }
 
 #[derive(Clone)]
