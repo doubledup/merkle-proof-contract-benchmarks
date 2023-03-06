@@ -60,17 +60,21 @@ fn single_proofs_sorted_hashes(leaf_indices: Vec<usize>) -> String {
 pragma solidity ^0.8.17;
 
 import \"forge-std/Test.sol\";
-import \"openzeppelin/utils/cryptography/MerkleProof.sol\";
+import \"src/SingleProofs.sol\";
 
 contract SingleProofsTest is Test {{
     {}
+    SingleProofs proofContract;
+
+    function setUp() public {{
+        proofContract = new SingleProofs();
+    }}
+
     {}
 {}
     {}
     function testSingleProofs() public view {{
-        for (uint i = 0; i < leaves.length; ++i) {{
-            assert(MerkleProof.verify(proofs[i], root, keccak256(abi.encode(leaves[i]))));
-        }}
+        assert(proofContract.verifyProofs(root, proofs, leaves));
     }}
 }}
 ",
@@ -93,7 +97,7 @@ fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
         })
         .collect::<Vec<_>>();
 
-    format!("bytes32[] leaves = [ {} ];\n",
+    format!("bytes32[] leaves = [ {} ];",
         leaves_hex.into_iter()
             .map(|leaf| format!("bytes32(0x{})", leaf))
             .collect::<Vec<_>>()
@@ -145,10 +149,15 @@ fn multi_proofs_test_contract(leaf_indices: Vec<usize>) -> String {
 pragma solidity ^0.8.17;
 
 import \"forge-std/Test.sol\";
-import \"solidity-merkle-trees/MerkleMultiProof.sol\";
+import \"src/MultiProof.sol\";
 
-contract MultiProofsTest is Test {{
+contract MultiProofTest is Test {{
     {}
+    MultiProof proofContract;
+
+    function setUp() public {{
+        proofContract = new MultiProof();
+    }}
 
     function testMultiProofs() public view {{
         {}
@@ -156,7 +165,7 @@ contract MultiProofsTest is Test {{
         {}
 {}
 
-        assert(MerkleMultiProof.verifyProof(root, proof, leaves));
+        assert(proofContract.verifyProof(root, proof, leaves));
     }}
 }}
 ",

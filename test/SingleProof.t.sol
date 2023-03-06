@@ -2,10 +2,15 @@
 pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
-import "openzeppelin/utils/cryptography/MerkleProof.sol";
+import "src/SingleProofs.sol";
 
 contract SingleProofsTest is Test {
     bytes32[] leaves = [ bytes32(0xfa4859480aa6d899858de54334d2911e01c070df858de54334d2911e01c070df), bytes32(0x355069da35e598913d8736e5b8340527099960b83d8736e5b8340527099960b8), bytes32(0x7663893c3dc0850efc5391f5e5887ed723e51b83fc5391f5e5887ed723e51b83) ];
+    SingleProofs proofContract;
+
+    function setUp() public {
+        proofContract = new SingleProofs();
+    }
 
     bytes32 root = 0x9bc0c8d73b07d734720fa43b6849ef1cdab2565b48e3705473587da87b055ea6;
     bytes32[] proof0 = [ bytes32(0x95bd95a9bcbd6db76c73e14ecde47f65d0e17a32cecf8a8213b8fd7a43475df1), bytes32(0x22d40b6ffbaf81a4682a24c59e4efc93715d6ee21bddb4d797b91526369c8b3f), bytes32(0x3c6a09d9f2d31ed23a393a95f03fd4f6ea0b6a181b8f21d19c9f69117f9ff118), bytes32(0x125f3f2840fc2efe872ebc90a12287360b8545bd27a4a531c57383e731bcc8e7), bytes32(0x587ff23491bd611850951f5687cf01abd2f3d1fb7831abae7ce9dfc29a6f840e), bytes32(0x59c94a159accf87d0ef183b868a6e63f29e3b8787aa0ca8bcbe0526461f30ede), bytes32(0xc66c1da05d80ec9e72cc3bed4e600da7d688c7a7bde6c029749ecd9abe0a0c44), bytes32(0x1b8f8258cbfa5698be5e7fc441c60f8243a93cb04564451cee384533626b5649) ];
@@ -14,8 +19,6 @@ contract SingleProofsTest is Test {
     bytes32[][] proofs = [ proof0, proof1, proof2 ];
 
     function testSingleProofs() public view {
-        for (uint i = 0; i < leaves.length; ++i) {
-            assert(MerkleProof.verify(proofs[i], root, keccak256(abi.encode(leaves[i]))));
-        }
+        assert(proofContract.verifyProofs(root, proofs, leaves));
     }
 }

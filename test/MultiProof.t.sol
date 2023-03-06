@@ -2,10 +2,15 @@
 pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
-import "solidity-merkle-trees/MerkleMultiProof.sol";
+import "src/MultiProof.sol";
 
-contract MultiProofsTest is Test {
+contract MultiProofTest is Test {
     bytes32 root = 0x9bc0c8d73b07d734720fa43b6849ef1cdab2565b48e3705473587da87b055ea6;
+    MultiProof proofContract;
+
+    function setUp() public {
+        proofContract = new MultiProof();
+    }
 
     function testMultiProofs() public view {
         Node[] memory leaves = new Node[](3);
@@ -41,6 +46,6 @@ contract MultiProofsTest is Test {
         proof[7] = new Node[](0);
         proof[8] = new Node[](0);
 
-        assert(MerkleMultiProof.verifyProof(root, proof, leaves));
+        assert(proofContract.verifyProof(root, proof, leaves));
     }
 }
