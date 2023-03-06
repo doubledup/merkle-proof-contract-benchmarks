@@ -118,7 +118,6 @@ impl Hasher for Keccak256 {
 fn multi_proofs_test_contract(leaf_indices: Vec<usize>) -> String {
     let leaves = build_leaves_str_multi_proof(leaf_indices.clone());
 
-    // let tree = MerkleTree::<Keccak256>::from_leaves(&data::LEAVES.map(|leaf| keccak256(leaf.as_slice())));
     let tree = MerkleTree::<Keccak256>::from_leaves(&data::LEAVES.map(|leaf| keccak256(leaf.as_slice())));
     let root = format!("bytes32 root = 0x{};", tree.root_hex().unwrap());
 
