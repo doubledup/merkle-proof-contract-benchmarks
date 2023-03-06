@@ -8,3 +8,6 @@
 # Used by foundry
 out/
 cache/
+
+test/SingleProofs*.t.sol
+test/MultiProof*.t.sol

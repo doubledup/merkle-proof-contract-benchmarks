@@ -1270,6 +1270,7 @@ dependencies = [
  "beefy-merkle-tree",
  "hex",
  "hex-literal",
+ "rand 0.8.5",
  "rs_merkle",
  "tiny-keccak",
 ]

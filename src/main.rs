@@ -2,24 +2,43 @@ use std::io::Write;
 use std::fs::File;
 use beefy_merkle_tree::{merkle_proof, merkle_root, verify_proof};
 use tiny_keccak::keccak256;
+use rand::{Rng, thread_rng};
 use rs_merkle::{Hasher, MerkleTree};
 
 mod data;
 
-fn main() -> std::io::Result<()> {
-    let leaf_indices = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+const PROOF_COUNT: usize = 14;
+const TEST_COUNT: usize = 100;
 
-    let single_proofs = single_proofs_sorted_hashes(leaf_indices.clone());
+fn main() {
+    let mut rng = thread_rng();
 
-    let mut single_proof_file = File::create("test/SingleProofs.t.sol")?;
-    let single_proof_result = single_proof_file.write_all(single_proofs.as_bytes());
+    for test_number in 0..TEST_COUNT {
+        println!("Generating test case #{}", test_number);
 
-    let multi_proofs = multi_proofs_test_contract(leaf_indices);
+        let mut leaf_indices: Vec<usize> = Vec::with_capacity(PROOF_COUNT);
+        while leaf_indices.len() < PROOF_COUNT {
+            let i = rng.gen_range(0..data::LEAVES.len());
+            if leaf_indices.contains(&i) {
+                continue;
+            } else {
+                leaf_indices.push(i);
+            }
+        }
+        leaf_indices.sort();
 
-    let mut multi_proof_file = File::create("test/MultiProof.t.sol")?;
-    let multi_proof_result = multi_proof_file.write_all(multi_proofs.as_bytes());
+        let single_proofs = single_proofs_sorted_hashes(leaf_indices.clone());
 
-    single_proof_result.and(multi_proof_result)
+        File::create(format!("test/SingleProofs{}.t.sol", test_number))
+            .and_then(|mut single_proof_file| single_proof_file.write_all(single_proofs.as_bytes()))
+            .unwrap();
+
+        let multi_proofs = multi_proofs_test_contract(leaf_indices);
+
+        File::create(format!("test/MultiProof{}.t.sol", test_number))
+            .and_then(|mut multi_proof_file| multi_proof_file.write_all(multi_proofs.as_bytes()))
+            .unwrap();
+    }
 }
 
 fn single_proofs_sorted_hashes(leaf_indices: Vec<usize>) -> String {
@@ -84,14 +103,9 @@ contract SingleProofsTest is Test {{
 }
 
 fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
-    let leaves_hex = data::LEAVES.into_iter()
-        .enumerate()
-        .filter_map(|(i, leaf)| {
-            if leaf_indices.contains(&i) {
-                Some(hex::encode(&leaf))
-            } else {
-                None
-            }
+    let leaves_hex = leaf_indices.into_iter()
+        .filter_map(|i| {
+            Some(hex::encode(&data::LEAVES[i]))
         })
         .collect::<Vec<_>>();
 
@@ -147,6 +161,8 @@ fn multi_proofs_test_contract(leaf_indices: Vec<usize>) -> String {
         .collect::<Vec<String>>()
         .join("\n");
 
+    // TODO: assert that multi proof is correct
+
     format!("// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
@@ -179,14 +195,9 @@ contract MultiProofTest is Test {{
 }
 
 fn build_leaves_str_multi_proof(leaf_indices: Vec<usize>) -> String {
-    let leaves_hex = data::LEAVES.into_iter()
-        .enumerate()
-        .filter_map(|(i, leaf)| {
-            if leaf_indices.contains(&i) {
-                Some((i, hex::encode(&leaf)))
-            } else {
-                None
-            }
+    let leaves_hex = leaf_indices.into_iter()
+        .filter_map(|j| {
+            Some((j, hex::encode(&data::LEAVES[j])))
         })
         .collect::<Vec<_>>();
 
