@@ -7,7 +7,7 @@ use rs_merkle::{Hasher, MerkleTree};
 mod data;
 
 fn main() -> std::io::Result<()> {
-    let leaf_indices = vec![3, 57, 134];
+    let leaf_indices = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
     let single_proofs = single_proofs_sorted_hashes(leaf_indices.clone());
 
