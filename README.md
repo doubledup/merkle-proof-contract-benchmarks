@@ -1,6 +1,32 @@
 # optimisation-beefy-merkle-proofs
 
-Comparison of EVM gas costs for verifying Merkle proofs in different proof schemes.
+Comparison of EVM gas costs for verifying Merkle proofs in 2 different proof schemes: multiple single proofs with hash
+sorting and multi proofs.
+
+The single proofs sort hash pairs before combining them as they work their way up the tree. This changes the structure
+of the Merkle trees used, effectively randomly swapping every pair of sibling subtrees. eg. what would have been
+
+```
+          567
+        /     \
+    789         234
+   /   \
+123     456
+```
+
+becomes
+
+```
+          890
+        /     \
+    234         789
+               /   \
+            123     456
+```
+
+Since `123` and `456` are already sorted, they retain their order and their parent hash is the same. But `789` and `234`
+are not sorted, so they're swapped, bringing all of their child nodes with them. Because their order is changed, their
+parent hash changes, in this example from `567` to `890`.
 
 ## Setup
 
@@ -31,9 +57,9 @@ forge test -vv --gas-report --optimize
 ## Test results
 
 This is based on verifying a random sample of 14 leaves (`PROOF_COUNT`) out of a total of 1000 leaves
-(`data::LEAVES.len()`). The single proofs sort hashes before combining them, while the multi proofs do not. Results are
-similar whether sampling 100 or 1000 times (`TEST_COUNT`): multi proofs consume around 586_000 gas while single proofs
-consume around 69_000 gas (about 12% of the gas used by multi proofs). Results from executing tests are below.
+(`data::LEAVES.len()`). Results are similar whether sampling 100 or 1000 times (`TEST_COUNT`): multi proofs consume
+around 586_000 gas while single proofs consume around 69_000 gas (about 12% of the gas used by multi proofs). Results
+from executing tests are below.
 
 Comparing the total gas used by each test shows the same trend, though less significant: around 630_000 gas for multi
 proofs and 117_000 gas for single proofs (about 19% of the gas used by multi proofs).
