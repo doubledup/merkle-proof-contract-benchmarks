@@ -3,8 +3,8 @@
 Comparison of EVM gas costs for verifying Merkle proofs in 2 different proof schemes: multiple single proofs with hash
 sorting and multi proofs.
 
-The single proofs sort hash pairs before combining them as they work their way up the tree. This changes the structure
-of the Merkle trees used, effectively randomly swapping every pair of sibling subtrees. eg. what would have been
+The Merkle tree that's used for single proofs has sorted hash pairs. This changes the structure of the Merkle trees
+used, effectively randomly swapping every pair of sibling subtrees. eg. what would have been
 
 ```
           567
