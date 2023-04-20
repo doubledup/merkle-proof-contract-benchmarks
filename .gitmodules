@@ -10,3 +10,7 @@
 	path = lib/solidity-merkle-trees
 	url = https://github.com/polytope-labs/solidity-merkle-trees
 	branch = main
+[submodule "lib/solmate"]
+	path = lib/solmate
+	url = https://github.com/transmissions11/solmate
+	branch = 2001af4
