@@ -1,7 +1,7 @@
 # optimisation-beefy-merkle-proofs
 
 Comparison of EVM gas costs for verifying Merkle proofs in 2 different proof schemes: multiple single proofs with hash
-sorting and multi proofs.
+sorting and multi proofs without hash sorting.
 
 The Merkle tree that's used for single proofs has sorted hash pairs. This changes the structure of the Merkle trees
 used, effectively randomly swapping every pair of sibling subtrees. eg. what would have been
@@ -37,7 +37,7 @@ Requires Rust and Foundry. Run `forge install` once to fetch contract dependenci
 There are 3 ways to change inputs to the tests:
 
 1. The leaves used in the [sample data](src/data.rs).
-2. The number of leaves to prove in the `PROOF_COUNT` constant in the [test contract generation](src/main.rs).
+2. The number of leaves to prove in the `LEAF_COUNT` constant in the [test contract generation](src/main.rs).
 3. The number of test iterations to run in the `TEST_COUNT` constant in the [test contract generation](src/main.rs).
 
 ## Running
@@ -56,15 +56,14 @@ forge test -vv --gas-report --optimize
 
 ## Test results
 
-This is based on verifying a random sample of 14 leaves (`PROOF_COUNT`) out of a total of 1000 leaves
+This is based on verifying a random sample of 14 leaves (`LEAF_COUNT`) out of a total of 1000 leaves
 (`data::LEAVES.len()`). Results are similar whether sampling 100 or 1000 times (`TEST_COUNT`): multi proofs consume
-around 586_000 gas while single proofs consume around 69_000 gas (about 12% of the gas used by multi proofs). Results
-from executing tests are below.
+around 106_000 gas while single proofs consume around 68_000 gas in OpenZeppelin's implementation (about 64% of the gas
+used by multi proofs) and around 26_000 gas in Solmate's implementation (about 25% of the gas used by multi proofs).
+Results from executing the tests are below.
 
-Comparing the total gas used by each test shows the same trend, though less significant: around 630_000 gas for multi
-proofs and 117_000 gas for single proofs (about 19% of the gas used by multi proofs).
-
-This means that multi proofs are consuming around 5 to 8 times the amount of gas that single proofs consume.
+When proving relatively few of a large number of leaves, multi proofs consume around 2 to 4 times the amount of gas that
+single proofs do.
 
 ### 100 runs
 
@@ -74,13 +73,21 @@ This means that multi proofs are consuming around 5 to 8 times the amount of gas
 | Deployment Cost                        | Deployment Size |        |        |        |         |
 | 216857                                 | 1115            |        |        |        |         |
 | Function Name                          | min             | avg    | median | max    | # calls |
-| verifyProof                            | 488890          | 590445 | 590807 | 675274 | 100     |
+| verifyProof                            | 106839          | 106839 | 106839 | 106839 | 100     |
+
+
+| src/SingleProofsSolmate.sol:SingleProofsSolmate contract |                 |       |        |       |         |
+|----------------------------------------------------------|-----------------|-------|--------|-------|---------|
+| Deployment Cost                                          | Deployment Size |       |        |       |         |
+| 161008                                                   | 836             |       |        |       |         |
+| Function Name                                            | min             | avg   | median | max   | # calls |
+| verifyProofs                                             | 26271           | 26271 | 26271  | 26271 | 100     |
 
 
 | src/SingleProofsZeppelin.sol:SingleProofsZeppelin contract |                 |       |        |       |         |
-|--------------------------------------------|-----------------|-------|--------|-------|---------|
-| Deployment Cost                            | Deployment Size |       |        |       |         |
-| 206051                                     | 1061            |       |        |       |         |
-| Function Name                              | min             | avg   | median | max   | # calls |
-| verifyProofs                               | 68186           | 68896 | 68974  | 68988 | 100     |
+|------------------------------------------------------------|-----------------|-------|--------|-------|---------|
+| Deployment Cost                                            | Deployment Size |       |        |       |         |
+| 180026                                                     | 931             |       |        |       |         |
+| Function Name                                              | min             | avg   | median | max   | # calls |
+| verifyProofs                                               | 67920           | 67920 | 67920  | 67920 | 100     |
 ```
