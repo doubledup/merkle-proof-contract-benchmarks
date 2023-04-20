@@ -32,10 +32,10 @@ fn main() {
         }
         leaf_indices.sort();
 
-        let single_proofs = single_proofs_sorted(leaf_indices.clone());
+        let single_proofs_zeppelin = single_proofs_zeppelin_sorted(leaf_indices.clone());
 
-        File::create(format!("test/SingleProofs{}.t.sol", test_number))
-            .and_then(|mut single_proof_file| single_proof_file.write_all(single_proofs.as_bytes()))
+        File::create(format!("test/SingleProofsZeppelin{}.t.sol", test_number))
+            .and_then(|mut single_proof_file| single_proof_file.write_all(single_proofs_zeppelin.as_bytes()))
             .unwrap();
 
         let multi_proofs = multi_proof_unsorted(leaf_indices);
@@ -46,7 +46,7 @@ fn main() {
     }
 }
 
-fn single_proofs_sorted(leaf_indices: Vec<usize>) -> String {
+fn single_proofs_zeppelin_sorted(leaf_indices: Vec<usize>) -> String {
     let root = format!("bytes32 root = 0x{};", hex::encode(merkle_root::<beefy_merkle_tree::Keccak256, _>(data::LEAVES)));
 
     let leaves = build_leaves_str_single_proof(leaf_indices.clone());
@@ -84,17 +84,17 @@ fn single_proofs_sorted(leaf_indices: Vec<usize>) -> String {
 pragma solidity ^0.8.19;
 
 import \"forge-std/Test.sol\";
-import \"src/SingleProofs.sol\";
+import \"src/SingleProofsZeppelin.sol\";
 
-contract SingleProofsTest is Test {{
+contract SingleProofsZeppelinTest is Test {{
     {}
-    SingleProofs proofContract;
+    SingleProofsZeppelin proofContract;
 
     function setUp() public {{
-        proofContract = new SingleProofs();
+        proofContract = new SingleProofsZeppelin();
     }}
 
-    function testSingleProofs() public view {{
+    function testSingleProofsZeppelin() public view {{
         {}
         {}
 {}

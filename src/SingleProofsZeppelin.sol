@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import "solidity-merkle-trees/MerkleMultiProof.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
 
-contract SingleProofs {
+contract SingleProofsZeppelin {
     constructor() {
     }
 

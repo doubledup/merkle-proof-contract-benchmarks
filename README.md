@@ -77,7 +77,7 @@ This means that multi proofs are consuming around 5 to 8 times the amount of gas
 | verifyProof                            | 488890          | 590445 | 590807 | 675274 | 100     |
 
 
-| src/SingleProofs.sol:SingleProofs contract |                 |       |        |       |         |
+| src/SingleProofsZeppelin.sol:SingleProofsZeppelin contract |                 |       |        |       |         |
 |--------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                            | Deployment Size |       |        |       |         |
 | 206051                                     | 1061            |       |        |       |         |
