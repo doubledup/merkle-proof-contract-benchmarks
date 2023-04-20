@@ -38,6 +38,12 @@ fn main() {
             .and_then(|mut single_proof_file| single_proof_file.write_all(single_proofs_zeppelin.as_bytes()))
             .unwrap();
 
+        let single_proofs_solmate = single_proofs_solmate_sorted(leaf_indices.clone());
+
+        File::create(format!("test/SingleProofsSolmate{}.t.sol", test_number))
+            .and_then(|mut single_proof_file| single_proof_file.write_all(single_proofs_solmate.as_bytes()))
+            .unwrap();
+
         let multi_proofs = multi_proof_unsorted(leaf_indices);
 
         File::create(format!("test/MultiProof{}.t.sol", test_number))
@@ -127,6 +133,70 @@ fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
             .map(|(i, leaf)| format!("        leaves[{}] = keccak256(abi.encode(bytes32(0x{})));", i, leaf))
             .collect::<Vec<_>>()
             .join("\n"))
+}
+
+fn single_proofs_solmate_sorted(leaf_indices: Vec<usize>) -> String {
+    let root = format!("bytes32 root = 0x{};", hex::encode(merkle_root::<beefy_merkle_tree::Keccak256, _>(data::LEAVES)));
+
+    let leaves = build_leaves_str_single_proof(leaf_indices.clone());
+
+    let proofs_sorted_hashes = leaf_indices.into_iter()
+        .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::LEAVES, i));
+
+    let proofs_declaration = format!("bytes32[][] memory proofs = new bytes32[][]({});\n", proofs_sorted_hashes.len());
+
+    let proofs_values = proofs_sorted_hashes
+        .clone()
+        .enumerate()
+        .map(|(i, proof)| {
+            let proof_length = proof.proof.len();
+            let proof_hashes = proof.proof.into_iter()
+                    .enumerate()
+                    .map(|(j, hash)| format!("        proofs[{}][{}] = bytes32(0x{});", i, j, hex::encode(hash)))
+                    .collect::<Vec<String>>()
+                    .join("\n");
+            format!("        proofs[{}] = new bytes32[]({});\n{}",
+                i,
+                proof_length,
+                proof_hashes,
+            )
+        })
+        .collect::<Vec<String>>()
+        .join("\n\n");
+
+    proofs_sorted_hashes.into_iter().for_each(|proof|{
+        let verified = verify_proof::<beefy_merkle_tree::Keccak256, _, _>(&proof.root, proof.proof, proof.number_of_leaves, proof.leaf_index, &proof.leaf);
+        assert!(verified);
+    });
+
+    format!("// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.19;
+
+import \"forge-std/Test.sol\";
+import \"src/SingleProofsSolmate.sol\";
+
+contract SingleProofsSolmateTest is Test {{
+    {}
+    SingleProofsSolmate proofContract;
+
+    function setUp() public {{
+        proofContract = new SingleProofsSolmate();
+    }}
+
+    function testSingleProofsSolmate() public view {{
+        {}
+        {}
+{}
+
+        assert(proofContract.verifyProofs(root, proofs, leaves));
+    }}
+}}
+",
+        root,
+        leaves,
+        proofs_declaration,
+        proofs_values,
+    )
 }
 
 #[derive(Clone)]
