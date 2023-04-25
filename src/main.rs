@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 
-use beefy_merkle_tree::{merkle_proof, merkle_root, verify_proof};
+use beefy_merkle_tree::{merkle_proof, verify_proof};
 use data::LEAVES;
 use rs_merkle::{Hasher, MerkleTree};
 
@@ -54,12 +54,13 @@ fn main() {
 }
 
 fn single_proofs_zeppelin_sorted(leaf_indices: Vec<usize>) -> String {
-    let root = format!("bytes32 root = 0x{};", hex::encode(merkle_root::<beefy_merkle_tree::Keccak256, _>(data::LEAVES)));
-
     let leaves = build_leaves_str_single_proof(leaf_indices.clone());
 
     let proofs_sorted_hashes = leaf_indices.into_iter()
         .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::LEAVES, i));
+
+    let root_hash = proofs_sorted_hashes.clone().peekable().peek().unwrap().root;
+    let root = format!("bytes32 root = 0x{};", hex::encode(root_hash));
 
     let proofs_declaration = format!("bytes32[][] memory proofs = new bytes32[][]({});\n", proofs_sorted_hashes.len());
 
@@ -137,12 +138,13 @@ fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
 }
 
 fn single_proofs_solmate_sorted(leaf_indices: Vec<usize>) -> String {
-    let root = format!("bytes32 root = 0x{};", hex::encode(merkle_root::<beefy_merkle_tree::Keccak256, _>(data::LEAVES)));
-
     let leaves = build_leaves_str_single_proof(leaf_indices.clone());
 
     let proofs_sorted_hashes = leaf_indices.into_iter()
         .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::LEAVES, i));
+
+    let root_hash = proofs_sorted_hashes.clone().peekable().peek().unwrap().root;
+    let root = format!("bytes32 root = 0x{};", hex::encode(root_hash));
 
     let proofs_declaration = format!("bytes32[][] memory proofs = new bytes32[][]({});\n", proofs_sorted_hashes.len());
 
