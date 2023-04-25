@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::Write;
 
 use beefy_merkle_tree::{merkle_proof, merkle_root, verify_proof};
+use data::LEAVES;
 use rs_merkle::{Hasher, MerkleTree};
 
 use tiny_keccak::keccak256;
@@ -16,7 +17,7 @@ const TEST_COUNT: usize = 100;
 
 fn main() {
     let mut rng = thread_rng();
-    let index_distribution = Uniform::from(0..LEAF_COUNT);
+    let index_distribution = Uniform::from(0..LEAVES.len());
 
     for test_number in 0..TEST_COUNT {
         println!("Generating test case #{}", test_number);
