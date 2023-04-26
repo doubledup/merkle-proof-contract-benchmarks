@@ -15,7 +15,7 @@ const TEST_COUNT: usize = 100;
 
 fn main() {
     let mut rng = thread_rng();
-    let index_distribution = Uniform::from(0..LEAVES.len());
+    let index_distribution = Uniform::from(0..RANDOM_LEAVES.len());
 
     for test_number in 0..TEST_COUNT {
         println!("Generating test case #{}", test_number);
@@ -55,7 +55,7 @@ fn single_proofs_zeppelin_sorted(leaf_indices: Vec<usize>) -> String {
     let leaves = build_leaves_str_single_proof(leaf_indices.clone());
 
     let proofs_sorted_hashes = leaf_indices.into_iter()
-        .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::LEAVES, i));
+        .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::RANDOM_LEAVES, i));
 
     let root_hash = proofs_sorted_hashes.clone().peekable().peek().unwrap().root;
     let root = format!("bytes32 root = 0x{};", hex::encode(root_hash));
@@ -119,7 +119,7 @@ contract SingleProofsZeppelinTest is Test {{
 fn build_leaves_str_single_proof(leaf_indices: Vec<usize>) -> String {
     let leaves_hex = leaf_indices.into_iter()
         .filter_map(|i| {
-            Some(hex::encode(&data::LEAVES[i]))
+            Some(hex::encode(&data::RANDOM_LEAVES[i]))
         })
         .collect::<Vec<_>>();
 
@@ -139,7 +139,7 @@ fn single_proofs_solmate_sorted(leaf_indices: Vec<usize>) -> String {
     let leaves = build_leaves_str_single_proof(leaf_indices.clone());
 
     let proofs_sorted_hashes = leaf_indices.into_iter()
-        .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::LEAVES, i));
+        .map(|i| merkle_proof::<beefy_merkle_tree::Keccak256, _, _>(data::RANDOM_LEAVES, i));
 
     let root_hash = proofs_sorted_hashes.clone().peekable().peek().unwrap().root;
     let root = format!("bytes32 root = 0x{};", hex::encode(root_hash));
@@ -212,7 +212,7 @@ impl Hasher for Keccak256 {
 }
 
 fn multi_proof_unsorted(leaf_indices: Vec<usize>) -> String {
-    let tree = MerkleTree::<Keccak256>::from_leaves(&data::LEAVES.map(|leaf| keccak256(leaf.as_slice())));
+    let tree = MerkleTree::<Keccak256>::from_leaves(&data::RANDOM_LEAVES.map(|leaf| keccak256(leaf.as_slice())));
     let root = format!("bytes32 root = 0x{};", tree.root_hex().unwrap());
 
     let leaves = build_leaves_str_multi_proof(leaf_indices.clone());
@@ -276,7 +276,7 @@ contract MultiProofTest is Test {{
 fn build_leaves_str_multi_proof(leaf_indices: Vec<usize>) -> String {
     let leaves_hex = leaf_indices.into_iter()
         .filter_map(|j| {
-            Some((j, hex::encode(&data::LEAVES[j])))
+            Some((j, hex::encode(&data::RANDOM_LEAVES[j])))
         })
         .collect::<Vec<_>>();
 
