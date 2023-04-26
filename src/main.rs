@@ -2,13 +2,11 @@ use std::fs::File;
 use std::io::Write;
 
 use beefy_merkle_tree::{merkle_proof, verify_proof};
-use data::LEAVES;
+use merkle_proof_contract_benchmarks::data::RANDOM_LEAVES;
 use rs_merkle::{Hasher, MerkleTree};
 
 use tiny_keccak::keccak256;
 use rand::{thread_rng, distributions::Uniform, prelude::Distribution};
-
-mod data;
 
 // Number of leaves to use in each test case
 const LEAF_COUNT: usize = 14;

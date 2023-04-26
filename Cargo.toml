@@ -1,5 +1,5 @@
 [package]
-name = "optimisation-beefy-merkle-proofs"
+name = "merkle-proof-contract-benchmarks"
 version = "0.1.0"
 edition = "2021"
 

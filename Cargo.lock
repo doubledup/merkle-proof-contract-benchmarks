@@ -1130,6 +1130,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
 
 [[package]]
+name = "merkle-proof-contract-benchmarks"
+version = "0.1.0"
+dependencies = [
+ "beefy-merkle-tree",
+ "hex",
+ "hex-literal",
+ "rand 0.8.5",
+ "rs_merkle",
+ "tiny-keccak",
+]
+
+[[package]]
 name = "merlin"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1262,18 +1274,6 @@ name = "opaque-debug"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
-
-[[package]]
-name = "optimisation-beefy-merkle-proofs"
-version = "0.1.0"
-dependencies = [
- "beefy-merkle-tree",
- "hex",
- "hex-literal",
- "rand 0.8.5",
- "rs_merkle",
- "tiny-keccak",
-]
 
 [[package]]
 name = "parity-scale-codec"
