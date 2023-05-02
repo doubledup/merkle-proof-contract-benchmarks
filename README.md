@@ -45,7 +45,7 @@ There are 3 ways to change inputs to the tests:
 Generate contract tests:
 
 ```sh
-cargo run --release
+cargo run --release --bin merkle-proof-contract-benchmarks
 ```
 
 Execute tests:
