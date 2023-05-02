@@ -18,4 +18,16 @@ contract SingleProofsSolmate {
         }
         return verified;
     }
+
+    function verifyRoots(bytes32 root, bytes32[][] calldata proofs, bytes32[] memory leaves)
+        public
+        pure
+        returns (bool)
+    {
+        bool verified = true;
+        for (uint i = 0; i < leaves.length; ++i) {
+            verified = verified && MerkleProofLib.calculateRoot(proofs[i], leaves[i]) == root;
+        }
+        return verified;
+    }
 }

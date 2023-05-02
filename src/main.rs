@@ -190,6 +190,7 @@ contract SingleProofsSolmateTest is Test {{
 {}
 
         assert(proofContract.verifyProofs(root, proofs, leaves));
+        assert(proofContract.verifyRoots(root, proofs, leaves));
     }}
 }}
 ",
