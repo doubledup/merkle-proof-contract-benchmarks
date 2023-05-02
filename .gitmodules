@@ -12,5 +12,5 @@
 	branch = main
 [submodule "lib/solmate"]
 	path = lib/solmate
-	url = https://github.com/transmissions11/solmate
-	branch = 2001af4
+	url = https://github.com/Snowfork/solmate
+	branch = main
